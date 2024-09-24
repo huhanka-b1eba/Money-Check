@@ -2,6 +2,11 @@ import java.util.Scanner;
 import java.util.Arrays;
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 class App {
 	public static void start() {
@@ -16,7 +21,7 @@ class App {
 		System.out.println("Чтобы ознакомиться со всеми расходами и доходами, введите \"oper\"");
 	}
 
-	public static void workDataBase() {
+	public static String getDataBase() {
 		String path = ".";
 		File dir = new File(path);
 		File dataFolder = new File(dir, "Data");
@@ -31,6 +36,44 @@ class App {
 			} catch (IOException e){
 				System.out.println("Ошибка создания файла" + e.getMessage());
 			}
+		}
+
+		try(InputStream is = new FileInputStream(newFile)) {
+			byte[] bytes = new byte[1024];
+			int len = is.read(bytes);
+			return (new String(bytes));
+
+		} catch (FileNotFoundException e) {
+			return("File не существует");
+		} catch (IOException e){
+			return("Ошибка чтения файла" + e.getMessage());
+		}
+	}
+
+	public static void writeDataBase() {
+		String path = ".";
+		File dir = new File(path);
+		File dataFolder = new File(dir, "Data");
+		if (!dataFolder.exists()){
+			dataFolder.mkdir();
+		}
+		File newFile = new File(dataFolder, "Database.txt");
+		if(!newFile.exists()){
+			try {
+				newFile.createNewFile();
+				System.out.println("Файл создан");
+			} catch (IOException e){
+				System.out.println("Ошибка создания файла" + e.getMessage());
+			}
+		}
+
+		try(OutputStream os = new FileOutputStream(newFile, true)) {
+			String newData = "\n26.09.2024 Расход 2000";
+			os.write(newData.getBytes());
+		} catch (FileNotFoundException e) {
+			System.out.println("File не существует");
+		} catch (IOException e){
+			System.out.println("Ошибка записи файла" + e.getMessage());
 		}
 	}
 
@@ -57,18 +100,21 @@ class App {
 		System.out.println("Все ваши операции:");
 	}
 
-	public static int conversion(String currentCurrency, String newCurrency, int currentTotal) {
-		float dollars = 92.8f;
-		float euro = 103.54f;
-		return 52;
-	}
-
 	public static void main(String[] args) {
 		int userTotalCurrent = 0;
 
+		String str = getDataBase();
+        String[] words = str.split("\n");
+        for (String word : words) {
+            String[] datas = word.split(" ");
+            if (datas[1].equals("Доход")) System.out.println(Integer.valueOf(datas[2]));
+        }
+
+        System.out.println(userTotalCurrent);
+
+
 		start();
 		retryInfo();
-		workDataBase();
 		Scanner sc = new Scanner(System.in);
 		boolean check = true;
 		while(check) {
@@ -82,7 +128,7 @@ class App {
     				getTotalCurrency(userTotalCurrent);
         			break;
     			case "oper":
-    				toOperation();
+    				getDataBase();
         			break;
     			default: 
         			check = false;
