@@ -1,6 +1,7 @@
 import java.util.Scanner;
 import java.util.Arrays;
-// import java.io.File;
+import java.io.File;
+import java.io.IOException;
 
 class App {
 	public static void start() {
@@ -15,23 +16,23 @@ class App {
 		System.out.println("Чтобы ознакомиться со всеми расходами и доходами, введите \"oper\"");
 	}
 
-	// public static void workDataBase() {
-	// 	String path = ".\\Data";
-	// 	File dir = new File(path);
-	// 	// if (dir.exists()) {
-	// 	// 	System.out.println("Папка существует");
-	// 	// }
-
-	// 	File[] fileArray = dir.listFiles();
-	// 	if (fileArray == null){
-	// 		System.out.println("Папка не существует");
-	// 		return;
-	// 	} else {
-	// 		for(File file: fileArray){
-	// 			System.out.println(file.getName());
-	// 		}
-	// 	}
-	// }
+	public static void workDataBase() {
+		String path = ".";
+		File dir = new File(path);
+		File dataFolder = new File(dir, "Data");
+		if (!dataFolder.exists()){
+			dataFolder.mkdir();
+		}
+		File newFile = new File(dataFolder, "Database.txt");
+		if(!newFile.exists()){
+			try {
+				newFile.createNewFile();
+				System.out.println("Файл создан");
+			} catch (IOException e){
+				System.out.println("Ошибка создания файла" + e.getMessage());
+			}
+		}
+	}
 
 	public static int getCommand() {
 		Scanner sc = new Scanner(System.in);
