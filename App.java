@@ -19,8 +19,9 @@ class App {
         System.out.println("\n\"func\" - сделать операцию, \"status\" - просмотреть счет, \"oper\" - вывести все операции\n");
     }
 
-    public static String getDataBase() { // Correct
-        String path = ".";
+    public static File checkDataFolder() {
+    	String path = ".";
+    	
         File dir = new File(path);
         File dataFolder = new File(dir, "Data");
         if (!dataFolder.exists()){
@@ -30,11 +31,16 @@ class App {
         if(!newFile.exists()){
             try {
                 newFile.createNewFile();
-                System.out.println("Файл создан");
             } catch (IOException e){
                 System.out.println("Ошибка создания файла: " + e.getMessage());
             }
         }
+
+        return newFile;
+    }
+
+    public static String getDataBase() { // Correct
+    	File newFile = checkDataFolder();
 
         try(InputStream is = new FileInputStream(newFile)) {
             byte[] bytes = new byte[(int) newFile.length()];
@@ -49,21 +55,8 @@ class App {
     }
 
     public static void writeDataBase(int result) { // Correct
-        String path = ".";
-        File dir = new File(path);
-        File dataFolder = new File(dir, "Data");
-        if (!dataFolder.exists()){
-            dataFolder.mkdir();
-        }
-        File newFile = new File(dataFolder, "Database.txt");
-        if(!newFile.exists()){
-            try {
-                newFile.createNewFile();
-                System.out.println("Файл создан");
-            } catch (IOException e){
-                System.out.println("Ошибка создания файла: " + e.getMessage());
-            }
-        }
+        File newFile = checkDataFolder(); 
+
 		// Запись новой операции в файл
         try(OutputStream os = new FileOutputStream(newFile, true)) {
         	if (result != 0){
