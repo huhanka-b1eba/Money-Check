@@ -9,19 +9,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 class App {
-    public static void start() {
+    public static void start() { // Correct
         System.out.println("Здравствуйте, вас привествует Money Check");
         System.out.println("Это приложение создано для того, чтобы вы смогли смотреть \n все ваши доходы и расходы, тем самым регулировать все ваши финансы");
         System.out.println("Желаем приятного пользования :3\n");
     }
 
-    public static void retryInfo() {
-        System.out.println("Для ознакомления с функционалом, введите \"func\"");
-        System.out.println("Для того чтобы узнать свой счет, введите \"status\"");
-        System.out.println("Чтобы ознакомиться со всеми расходами и доходами, введите \"oper\"");
+    public static void retryInfo() { // Correct
+        System.out.println("\n\"func\" - сделать операцию, \"status\" - просмотреть счет, \"oper\" - вывести все операции\n");
     }
 
-    public static String getDataBase() {
+    public static String getDataBase() { // Correct
         String path = ".";
         File dir = new File(path);
         File dataFolder = new File(dir, "Data");
@@ -50,7 +48,7 @@ class App {
         }
     }
 
-    public static void writeDataBase() {
+    public static void writeDataBase(int result) { // Correct
         String path = ".";
         File dir = new File(path);
         File dataFolder = new File(dir, "Data");
@@ -66,14 +64,12 @@ class App {
                 System.out.println("Ошибка создания файла: " + e.getMessage());
             }
         }
-
+		// Запись новой операции в файл
         try(OutputStream os = new FileOutputStream(newFile, true)) {
-        	//
-        	//
-        	//
-
-            String newData = "\n26.09.2024 Расход 2000";
-            os.write(newData.getBytes());
+        	if (result != 0){
+        		String newOperation = "\n" + java.time.LocalDate.now() + " " + (result > 0 ? "Доход" : "Расход") + " " + Math.abs(result);
+        		os.write(newOperation.getBytes());
+        	}  
         } catch (FileNotFoundException e) {
             System.out.println("Файл не существует");
         } catch (IOException e){
@@ -81,7 +77,7 @@ class App {
         }
     }
 
-    public static int getCommand() {
+    public static int getCommand() { // Correct
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nДля того чтобы добавить доход, введите \"income\", а затем сумму");
@@ -97,21 +93,19 @@ class App {
         return 0;
     }
 
-    public static void getTotalCurrency(int userTotalCurrent) {
-        System.out.println("Ваш счет составляет: " + userTotalCurrent + " рублей");
+    public static void getTotalCurrency(int userTotalCurrent) { // Correct
+        System.out.println("\nВаш счет составляет: " + userTotalCurrent + " рублей");
     }
 
-    public static void main(String[] args) {
-        int userTotalCurrent = 0;
+    public static int checkCurrense() { // Correct
+    	int userTotalCurrent = 0;
 
         String str = getDataBase();
-        System.out.println("Содержимое файла:");
-        System.out.println(str);
         String[] words = str.split("\n");
         
         for (String word : words) {
             if (word.trim().isEmpty()) {
-                continue; // Пропустить пустые строки
+                continue;
             }
 
             String[] datas = word.split(" ");
@@ -129,36 +123,35 @@ class App {
                 } else {
                     System.out.println("Неизвестный тип операции: " + datas[1]);
                 }
-                System.out.println("Добавлен " + datas[1] + ": " + cash);
+                // System.out.println("Добавлен " + datas[1] + ": " + cash);
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка в конвертации суммы в строке: " + word);
             }
         }
+        return userTotalCurrent;
+    }
 
-        System.out.println("Общий счет: " + userTotalCurrent);
+    public static void main(String[] args) {
 
+		int userTotalCurrent = checkCurrense();
         start();
-        retryInfo();
         Scanner sc = new Scanner(System.in);
         boolean check = true;
+
         while (check) {
+        	retryInfo();
             String userText = sc.nextLine();
             switch (userText) {
                 case "func":
                     int result = getCommand();
                     userTotalCurrent += result;
-                    // Запись новой операции в файл
-                    try (OutputStream os = new FileOutputStream("./Data/Database.txt", true)) {
-                        String newOperation = "\n" + java.time.LocalDate.now() + " " + (result > 0 ? "Доход" : "Расход") + " " + Math.abs(result);
-                        os.write(newOperation.getBytes());
-                    } catch (IOException e) {
-                        System.out.println("Ошибка записи файла: " + e.getMessage());
-                    }
+                    writeDataBase(result);
                     break;
                 case "status":
                     getTotalCurrency(userTotalCurrent);
                     break;
                 case "oper":
+                	System.out.println("\nВсе ваши операции:");
                     System.out.println(getDataBase());
                     break;
                 default:
